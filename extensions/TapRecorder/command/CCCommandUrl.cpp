@@ -1,16 +1,29 @@
-//
-//  CommandUrl.cpp
-//  TapRecorder
-//
-//  Created by kuwabara yuki on 2016/03/04.
-//  Copyright © 2016年 Drecom Co., Ltd. All rights reserved.
-//
+/****************************************************************************
+ Copyright (c) 2016 Yuki Kuwabara <do_low@hotmail.com>
+ http://www.cocos2d-x.org
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ ****************************************************************************/
 
 #include "CCCommandUrl.h"
 #include <sstream>
 #include "network/HttpClient.h"
 #include "platform/CCFileUtils.h"
 #include "extensions/TapRecorder/CCUrl.h"
+#include "extensions/TapRecorder/CCUtilTapRecorder.h"
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #include <Winsock2.h>
@@ -64,8 +77,7 @@ const cocos2d::Console::Command Command::Url::getCommand()
 void Command::Url::parseArguments(int fd, const std::string& argv)
 {
     // trim
-    std::vector<std::string> args;
-    Console::Utility::split(argv, ' ', args);
+    std::vector<std::string> args = Util::split(argv, ' ');
     
     for (std::vector<std::string>::iterator it = args.begin(); it != args.end();) {
         if (*it == "")
@@ -119,8 +131,7 @@ void Command::Upload::parseArguments(int fd, std::vector<std::string>& args)
             else if (*it == "async")
                 sync = false;
             else {
-                std::vector<std::string> strs;
-                Console::Utility::split(*it, '/', strs);
+                std::vector<std::string> strs = Util::split(*it, '/');
                 if (strs.at(0) == "http:" || strs.at(0) == "https:")
                     url = *it;
                 else
@@ -129,8 +140,7 @@ void Command::Upload::parseArguments(int fd, std::vector<std::string>& args)
         }
         
         if (saveName.empty()) {
-            std::vector<std::string> strs;
-            Console::Utility::split(url, '/', strs);
+            std::vector<std::string> strs = Util::split(url, '/');
             saveName = strs.back();
         }
         
@@ -159,13 +169,13 @@ void Command::Upload::upload(int fd, const std::string& url, const std::string& 
     
     ::Url* urlInstance = ::Url::getInstance();
     
-    urlInstance->getEventListener()->bindEventCallback("taprecorder_url_upload", [fd, sync, &waitCocosThread](::Url* urlInstance, int eventType) {
+    urlInstance->getEventListener()->bindEventCallback("taprecorder_url_upload", [fd, sync, &waitCocosThread](::Url* _urlInstance, int _eventType) {
         if (!sync)
             return;
         
-        switch (eventType) {
-            case ::Url::EventType::UPLOAD_ENDED : (void)(message(fd, createResponse(getIdentifier(), eventType, urlInstance->getSavePath()))); break;
-            case ::Url::EventType::UPLOAD_ERROR : (void)(message(fd, createResponse(getIdentifier(), eventType, urlInstance->getError()))); break;
+        switch (_eventType) {
+            case ::Url::EventType::UPLOAD_ENDED : (void)(message(fd, createResponse(getIdentifier(), _eventType, _urlInstance->getSavePath()))); break;
+            case ::Url::EventType::UPLOAD_ERROR : (void)(message(fd, createResponse(getIdentifier(), _eventType, _urlInstance->getError()))); break;
             default : return;
         }
         
@@ -220,8 +230,7 @@ void Command::Download::parseArguments(int fd, std::vector<std::string>& args)
             else if (*it == "async")
                 sync = false;
             else {
-                std::vector<std::string> strs;
-                Console::Utility::split(*it, '/', strs);
+                std::vector<std::string> strs = Util::split(*it, '/');
                 if (strs.at(0) == "http:" || strs.at(0) == "https:")
                     url = *it;
                 else
@@ -230,8 +239,7 @@ void Command::Download::parseArguments(int fd, std::vector<std::string>& args)
         }
         
         if (saveName.empty()) {
-            std::vector<std::string> strs;
-            Console::Utility::split(url, '/', strs);
+            std::vector<std::string> strs = Util::split(url, '/');
             saveName = strs.back();
         }
         
@@ -259,13 +267,13 @@ void Command::Download::download(int fd, const std::string& url, const std::stri
     }
     
     ::Url* urlInstance = ::Url::getInstance();
-    urlInstance->getEventListener()->bindEventCallback("taprecorder_url_download", [fd, sync, &waitCocosThread](::Url* urlInstance, int eventType) {
+    urlInstance->getEventListener()->bindEventCallback("taprecorder_url_download", [fd, sync, &waitCocosThread](::Url* _urlInstance, int _eventType) {
         if (!sync)
             return;
         
-        switch (eventType) {
-            case ::Url::EventType::DOWNLOAD_ENDED : (void)(message(fd, createResponse(getIdentifier(), eventType, urlInstance->getSavePath()))); break;
-            case ::Url::EventType::DOWNLOAD_ERROR : (void)(message(fd, createResponse(getIdentifier(), eventType, urlInstance->getError()))); break;
+        switch (_eventType) {
+            case ::Url::EventType::DOWNLOAD_ENDED : (void)(message(fd, createResponse(getIdentifier(), _eventType, _urlInstance->getSavePath()))); break;
+            case ::Url::EventType::DOWNLOAD_ERROR : (void)(message(fd, createResponse(getIdentifier(), _eventType, _urlInstance->getError()))); break;
             default : return;
         }
         

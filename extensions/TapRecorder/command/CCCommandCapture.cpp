@@ -1,16 +1,29 @@
-//
-//  CommandCapture.cpp
-//  TapRecorder
-//
-//  Created by kuwabara yuki on 2016/03/04.
-//  Copyright © 2016年 Drecom Co., Ltd. All rights reserved.
-//
+/****************************************************************************
+ Copyright (c) 2016 Yuki Kuwabara <do_low@hotmail.com>
+ http://www.cocos2d-x.org
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ ****************************************************************************/
 
 #include "CCCommandCapture.h"
 #include <sstream>
 #include "base/CCDirector.h"
 #include "base/CCScheduler.h"
 #include "extensions/TapRecorder/CCCapture.h"
+#include "extensions/TapRecorder/CCUtilTapRecorder.h"
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #include <Winsock2.h>
@@ -61,8 +74,7 @@ const cocos2d::Console::Command TapRecorder::Command::Capture::getCommand()
 
 void Command::Capture::parseArguments(int fd, const std::string& argv)
 {
-    std::vector<std::string> args;
-    Console::Utility::split(argv, ' ', args);
+    std::vector<std::string> args = Util::split(argv, ' ');
     
     for (std::vector<std::string>::iterator it = args.begin(); it != args.end();) {
         if (*it == "")
